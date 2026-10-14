@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>UPAGO - Suite de Recaudo, Pagos Automáticos y Cobranza Digital</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            base: '#0B0F17',
+                            surface: '#151C28',
+                            surfaceLight: '#1E2838',
+                            border: '#2A3649',
+                            blue: '#2563EB',
+                            cyan: '#06B6D4',
+                            mint: '#10B981',
+                            neonMint: '#00F59B',
+                            amber: '#F59E0B',
+                            rose: '#F43F5E',
+                            subtext: '#94A3B8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'neon-mint': '0 0 25px -4px rgba(0, 245, 155, 0.35)',
+                        'neon-blue': '0 0 25px -4px rgba(37, 99, 235, 0.4)',
+                        'card-depth': '0 20px 40px -15px rgba(0, 0, 0, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #05070B;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            color: #F8FAFC;
+        }
+
+        .phone-shell {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #0F1420 0%, #0B0E17 100%);
+            position: relative;
+            box-shadow: 0 0 70px rgba(0, 0, 0, 0.85);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .track-slider {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        .slide-pane {
+            min-width: 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 1.1rem 1.35rem 6.2rem 1.35rem;
+        }
+
+        .slide-pane::-webkit-scrollbar {
+            display: none;
+        }
+        .slide-pane {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Glassmorphism Dark Panel */
+        .glass-panel {
+            background: rgba(21, 28, 40, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card-interactive {
+            background: linear-gradient(145deg, rgba(30, 40, 56, 0.9) 0%, rgba(21, 28, 40, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Ambient Glow Circles */
+        .ambient-glow {
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            filter: blur(70px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.18;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.04); opacity: 0.85; }
+        }
+        .pulse-badge {
+            animation: badgePulse 2.8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center">
+
+    <main class="phone-shell">
+        
+        <!-- Ambient decorative lights -->
+        <div class="ambient-glow bg-brand-blue -top-12 -left-12"></div>
+        <div class="ambient-glow bg-brand-neonMint -bottom-16 -right-16"></div>
+
+        <!-- ================= TOP CONTROLS / INSTAGRAM STORIES STYLE HEADER ================= -->
+        <header class="px-4 pt-3.5 pb-2.5 z-30 shrink-0 border-b border-brand-border/60 bg-brand-base/85 backdrop-blur-md">
+            
+            <!-- Segmented Story Bars (5 Slides) -->
+            <div class="grid grid-cols-5 gap-1.5 mb-3" id="segmentedBar">
+                <div class="h-1.5 rounded-full bg-brand-neonMint transition-all duration-300" id="segBar0"></div>
+                <div class="h-1.5 rounded-full bg-brand-border transition-all duration-300" id="segBar1"></div>
+                <div class="h-1.5 rounded-full bg-brand-border transition-all duration-300" id="segBar2"></div>
+                <div class="h-1.5 rounded-full bg-brand-border transition-all duration-300" id="segBar3"></div>
+                <div class="h-1.5 rounded-full bg-brand-border transition-all duration-300" id="segBar4"></div>
+            </div>
+
+            <!-- Top Row: Logo + Topic Pill + Audio Toggle -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-blue to-brand-cyan flex items-center justify-center shadow-neon-blue">
+                        <span class="font-heading font-black text-xl tracking-tighter text-white">U</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-heading font-black text-xl tracking-tight text-white leading-none">UPAGO</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-neonMint animate-ping"></span>
+                        </div>
+                        <span id="topicIndicator" class="text-[11px] font-extrabold uppercase text-brand-neonMint tracking-wider block mt-0.5">
+                            01 &bull; Aseguramiento de Ingresos
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="soundBtn" onclick="toggleAudio()" class="w-9 h-9 rounded-xl glass-panel text-slate-300 hover:text-brand-neonMint flex items-center justify-center transition active:scale-90" aria-label="Audio">
+                        <i id="soundIcon" class="fas fa-volume-high text-xs"></i>
+                    </button>
+                    <button onclick="openLeadModal()" class="px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-white text-xs font-black hover:bg-white/15 transition active:scale-95">
+                        Demo
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= SLIDER VIEWPORT (5 PASOS) ================= -->
+        <div class="relative flex-1 overflow-hidden z-10" id="touchTrackArea">
+            <div class="track-slider" id="trackSlider">
+
+                <!-- ----------------- SLIDE 1: HERO IMPACTO ----------------- -->
+                <section class="slide-pane">
+                    <div class="space-y-4">
+                        
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-blue/15 border border-brand-blue/30 text-brand-cyan text-xs font-black uppercase tracking-wider">
+                            <i class="fas fa-microchip"></i>
+                            <span>Fintech LATAM &bull; 100% en Línea</span>
+                        </div>
+
+                        <h1 class="font-heading font-black text-3xl sm:text-[34px] text-white leading-[1.15] tracking-tight">
+                            Tus cobros recurrentes en <span class="bg-gradient-to-r from-brand-cyan via-brand-neonMint to-emerald-400 bg-clip-text text-transparent">piloto automático</span>
+                        </h1>
+
+                        <p class="text-base sm:text-[17px] text-slate-300 font-medium leading-relaxed">
+                            Garantizamos los ingresos mes a mes de tu empresa integrando <strong class="text-white">recaudo preventivo, cargos recurrentes y conciliación bancaria instantánea</strong> en Chile, México y Colombia.
+                        </p>
+
+                        <!-- Big Metrics Grid Card -->
+                        <div class="glass-card-interactive p-4 rounded-3xl border border-white/10 space-y-3">
+                            <div class="flex justify-between items-center text-xs font-black text-slate-400 uppercase tracking-wider pb-1 border-b border-brand-border">
+                                <span>Impacto Financiero Comprobado</span>
+                                <span class="text-brand-neonMint">Resultados Reales</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 pt-1">
+                                <div class="p-3.5 rounded-2xl bg-brand-surface/90 border border-brand-border">
+                                    <div class="text-3xl font-heading font-black text-brand-neonMint tracking-tight">Hasta 65%</div>
+                                    <div class="text-xs font-bold text-slate-300 mt-1">Aceleración en recuperación de pagos</div>
+                                </div>
+                                <div class="p-3.5 rounded-2xl bg-brand-surface/90 border border-brand-border">
+                                    <div class="text-3xl font-heading font-black text-brand-cyan tracking-tight">Hasta 20%</div>
+                                    <div class="text-xs font-bold text-slate-300 mt-1">Mayor cobro de facturas vencidas</div>
+                                </div>
+                            </div>
+
+                            <div class="p-3 rounded-2xl bg-brand-blue/10 border border-brand-blue/20 flex items-center justify-between text-xs font-bold text-slate-200">
+                                <span><i class="fas fa-clock text-brand-cyan mr-1.5"></i> Onboarding en solo 10 minutos</span>
+                                <span class="text-brand-neonMint font-black">Sin detener tu ERP</span>
+                            </div>
+                        </div>
+
+                        <!-- Mini Pain vs Solution Pill -->
+                        <div class="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-xs font-semibold text-rose-300 flex items-center gap-3">
+                            <i class="fas fa-triangle-exclamation text-rose-400 text-lg shrink-0"></i>
+                            <span>Basta de revisar transferencias a mano en Excel y cobrar a clientes que ya pagaron.</span>
+                        </div>
+
+                    </div>
+
+                    <button onclick="changeSlide(1)" class="w-full mt-3 py-4 px-5 rounded-2xl bg-gradient-to-r from-brand-blue via-brand-cyan to-brand-neonMint text-brand-base font-heading font-black text-base shadow-neon-mint flex items-center justify-between active:scale-[0.98] transition">
+                        <span class="tracking-wide">VER CÓMO RECAUDAMOS</span>
+                        <i class="fas fa-arrow-right text-lg"></i>
+                    </button>
+                </section>
+
+                <!-- ----------------- SLIDE 2: RECAUDO & CONCILIACIÓN EN TIEMPO REAL ----------------- -->
+                <section class="slide-pane">
+                    <div class="space-y-4">
+                        
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-brand-cyan text-xs font-black uppercase tracking-wider">
+                            <i class="fas fa-building-columns"></i>
+                            <span>Solución 01 &bull; Recaudo Multicanal</span>
+                        </div>
+
+                        <h2 class="font-heading font-black text-2xl sm:text-3xl text-white leading-tight">
+                            Portal único con <span class="text-brand-cyan">conciliación minuto a minuto</span>
+                        </h2>
+
+                        <p class="text-sm sm:text-base text-slate-300 font-medium">
+                            Conecta tus cuentas bancarias. Nuestro robot revisa cartolas cada 60 segundos y concilia automáticamente transferencias y tarjetas (débito/crédito) sin molestar a tus clientes.
+                        </p>
+
+                        <!-- Live Console Simulator -->
+                        <div class="glass-card-interactive p-4 sm:p-5 rounded-3xl border border-brand-border space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-brand-border">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                                    <span class="text-xs font-mono text-slate-300 font-bold">Robot Bancario UPAGO</span>
+                                </div>
+                                <span class="text-[10px] font-black bg-brand-neonMint/15 text-brand-neonMint px-2 py-0.5 rounded-md border border-brand-neonMint/30 uppercase">
+                                    Lectura Continua
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between items-baseline pt-1">
+                                <div>
+                                    <div class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Monto Conciliado Hoy</div>
+                                    <div id="simBankAmount" class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight mt-0.5">
+                                        $48.920.000
+                                    </div>
+                                </div>
+                                <span id="simBankChannel" class="text-xs font-black px-2.5 py-1 rounded-xl bg-brand-surfaceLight border border-brand-border text-brand-cyan">
+                                    Transferencia Directa
+                                </span>
+                            </div>
+
+                            <!-- Channel Switcher -->
+                            <div class="grid grid-cols-3 gap-2 pt-1">
+                                <button onclick="setSimChannel('transfer')" id="btnChanT" class="py-2.5 px-2 rounded-xl text-xs font-black bg-brand-blue text-white shadow-sm transition active:scale-95">
+                                    🏦 Transfer
+                                </button>
+                                <button onclick="setSimChannel('cards')" id="btnChanC" class="py-2.5 px-2 rounded-xl text-xs font-black bg-brand-surfaceLight text-slate-300 border border-brand-border hover:text-white transition active:scale-95">
+                                    💳 Tarjetas
+                                </button>
+                                <button onclick="setSimChannel('recurrent')" id="btnChanR" class="py-2.5 px-2 rounded-xl text-xs font-black bg-brand-surfaceLight text-slate-300 border border-brand-border hover:text-white transition active:scale-95">
+                                    🔄 PAC/PAT
+                                </button>
+                            </div>
+
+                            <div id="simBankDetails" class="p-3 rounded-2xl bg-brand-base/80 border border-brand-border text-xs text-slate-300 font-semibold flex items-center justify-between">
+                                <span><i class="fas fa-check text-brand-neonMint mr-1.5"></i> Abono directo en tu cuenta corriente</span>
+                                <span class="text-brand-neonMint font-black">Inmediato</span>
+                            </div>
+
+                            <button onclick="triggerSimConciliation()" id="btnActionReconcile" class="w-full py-3 rounded-xl bg-brand-surfaceLight border border-brand-cyan/40 text-brand-cyan hover:bg-brand-cyan/10 font-black text-xs transition active:scale-95 flex items-center justify-center gap-2">
+                                <i class="fas fa-play text-xs"></i>
+                                <span>SIMULAR LECTURA DE CARTOLA BANCARIA</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <button onclick="changeSlide(0)" class="text-xs font-extrabold text-slate-400 hover:text-white px-2 py-1">
+                            &larr; Volver
+                        </button>
+                        <button onclick="changeSlide(2)" class="text-xs font-black text-brand-neonMint hover:underline px-2 py-1">
+                            Ver Pagos Automáticos &rarr;
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ----------------- SLIDE 3: PAGOS AUTOMÁTICOS & MOTOR DE REINTENTOS ----------------- -->
+                <section class="slide-pane">
+                    <div class="space-y-4">
+                        
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-neonMint/15 border border-brand-neonMint/30 text-brand-neonMint text-xs font-black uppercase tracking-wider">
+                            <i class="fas fa-rotate"></i>
+                            <span>Solución 02 &bull; Cargos Recurrentes</span>
+                        </div>
+
+                        <h2 class="font-heading font-black text-2xl sm:text-3xl text-white leading-tight">
+                            Cargos domiciliados con <span class="text-brand-neonMint">motor de reintento A/B</span>
+                        </h2>
+
+                        <p class="text-sm sm:text-base text-slate-300 font-medium">
+                            Automatiza suscripciones con tarjetas débito/crédito. Cuando un cargo es rechazado por fondos temporales, nuestro algoritmo ejecuta reglas predictivas para transformarlo en cobro exitoso.
+                        </p>
+
+                        <!-- Interactive Retry Engine Mockup -->
+                        <div class="glass-card-interactive p-4 sm:p-5 rounded-3xl border border-brand-border space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-black text-slate-400 uppercase">Suscripción Mensual Domiciliada</span>
+                                <span id="retryStateBadge" class="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                    Intento Inicial
+                                </span>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl bg-brand-surface/90 border border-brand-border space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-black text-white">Cuota Plan Recurrente</span>
+                                    <span class="text-base font-black text-brand-neonMint">$85.000 CLP</span>
+                                </div>
+                                <div class="text-xs text-slate-400 flex items-center gap-2">
+                                    <i class="fas fa-credit-card text-brand-cyan"></i>
+                                    <span>Tarjeta Débito &bull;&bull;&bull;&bull; 7842</span>
+                                </div>
+                                <div id="retryConsoleLog" class="p-2.5 rounded-xl bg-brand-base border border-brand-border text-xs font-mono text-slate-300">
+                                    Estado: Listo para cobro mensual programado.
+                                </div>
+                            </div>
+
+                            <button onclick="testRetryEngine()" id="btnTestRetry" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-brand-blue to-brand-cyan text-white font-black text-xs shadow-neon-blue active:scale-95 transition flex items-center justify-center gap-2">
+                                <i class="fas fa-bolt"></i>
+                                <span>SIMULAR CARGO RECHAZADO + REINTENTO EXITOSO</span>
+                            </button>
+
+                            <!-- Biometrics verification feature -->
+                            <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-brand-neonMint flex items-center justify-center font-black text-sm shrink-0">
+                                    <i class="fas fa-fingerprint"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-black text-white">Validación Biométrica Antifraude</div>
+                                    <div class="text-[11px] text-slate-400 font-semibold">Verificación contra documento y selfie para eliminar contracargos.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <button onclick="changeSlide(1)" class="text-xs font-extrabold text-slate-400 hover:text-white px-2 py-1">
+                            &larr; Volver
+                        </button>
+                        <button onclick="changeSlide(3)" class="text-xs font-black text-brand-neonMint hover:underline px-2 py-1">
+                            Ver Cobranza Digital &rarr;
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ----------------- SLIDE 4: COBRANZA DIGITAL Y PREJUDICIAL ----------------- -->
+                <section class="slide-pane">
+                    <div class="space-y-4">
+                        
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-black uppercase tracking-wider">
+                            <i class="fas fa-bell"></i>
+                            <span>Solución 03 &bull; Cobranza Inteligente</span>
+                        </div>
+
+                        <h2 class="font-heading font-black text-2xl sm:text-3xl text-white leading-tight">
+                            Cobranza en 3 tiempos con <span class="text-rose-400">corte automático</span>
+                        </h2>
+
+                        <p class="text-sm sm:text-base text-slate-300 font-medium">
+                            Notificaciones programadas antes, durante y después del vencimiento vía <strong class="text-white">WhatsApp, Email tokenizado, SMS y VMS</strong>. Si el cliente paga, la cobranza se detiene al segundo.
+                        </p>
+
+                        <!-- Live Debt & Cut Simulator -->
+                        <div class="glass-card-interactive p-4 sm:p-5 rounded-3xl border border-brand-border space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-brand-border">
+                                <div>
+                                    <div class="text-xs font-black text-white">Factura Pendiente: #94021</div>
+                                    <div class="text-[11px] text-slate-400 font-bold">Cliente: Inmobiliaria & Retail SpA</div>
+                                </div>
+                                <span id="debtPill" class="text-[10px] font-black px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                    Cobranza Activa ⚠️
+                                </span>
+                            </div>
+
+                            <!-- Alert Channels List -->
+                            <div class="space-y-2">
+                                <div id="waNoticeItem" class="p-2.5 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between text-xs">
+                                    <span class="flex items-center gap-2 text-slate-200 font-bold">
+                                        <i class="fab fa-whatsapp text-emerald-400 text-sm"></i> WhatsApp Tokenizado
+                                    </span>
+                                    <span class="notice-badge text-[10px] font-black text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded">
+                                        Recordatorio Activo
+                                    </span>
+                                </div>
+
+                                <div id="emailNoticeItem" class="p-2.5 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between text-xs">
+                                    <span class="flex items-center gap-2 text-slate-200 font-bold">
+                                        <i class="fas fa-envelope text-brand-cyan text-sm"></i> Correo Electrónico
+                                    </span>
+                                    <span class="notice-badge text-[10px] font-black text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded">
+                                        Recordatorio Activo
+                                    </span>
+                                </div>
+
+                                <div id="vmsNoticeItem" class="p-2.5 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-between text-xs">
+                                    <span class="flex items-center gap-2 text-slate-200 font-bold">
+                                        <i class="fas fa-phone-volume text-purple-400 text-sm"></i> Llamado Voz Automático (VMS)
+                                    </span>
+                                    <span class="notice-badge text-[10px] font-black text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded">
+                                        Programado
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button onclick="executePaymentCut()" id="btnTriggerPaymentCut" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-brand-neonMint text-brand-base font-black text-xs shadow-neon-mint active:scale-95 transition flex items-center justify-center gap-2">
+                                <i class="fas fa-check-double text-sm"></i>
+                                <span>SIMULAR PAGO EN BANCO (DESACTIVAR AVISOS)</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <button onclick="changeSlide(2)" class="text-xs font-extrabold text-slate-400 hover:text-white px-2 py-1">
+                            &larr; Volver
+                        </button>
+                        <button onclick="changeSlide(4)" class="text-xs font-black text-brand-neonMint hover:underline px-2 py-1">
+                            Ver Seguridad & Demo &rarr;
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ----------------- SLIDE 5: SEGURIDAD, RESULTADOS Y CIERRE ----------------- -->
+                <section class="slide-pane">
+                    <div class="space-y-4">
+                        
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-brand-neonMint text-xs font-black uppercase tracking-wider">
+                            <i class="fas fa-shield-halved"></i>
+                            <span>Máxima Confianza Corporativa</span>
+                        </div>
+
+                        <h2 class="font-heading font-black text-2xl sm:text-3xl text-white leading-tight">
+                            Seguridad certificada y <span class="bg-gradient-to-r from-brand-cyan to-brand-neonMint bg-clip-text text-transparent">respaldo regional</span>
+                        </h2>
+
+                        <p class="text-sm sm:text-base text-slate-300 font-medium">
+                            Fundada en Chile en 2019 con operaciones consolidadas en México y Colombia. Cumplimos los más exigentes estándares bancarios mundiales.
+                        </p>
+
+                        <!-- Certifications Box -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-3.5 rounded-2xl glass-card-interactive border border-white/10 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-neonMint/15 text-brand-neonMint flex items-center justify-center font-black text-lg shrink-0">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div class="leading-tight">
+                                    <div class="text-xs font-black text-white">ISO 27001</div>
+                                    <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Seguridad de la información</div>
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl glass-card-interactive border border-white/10 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-cyan/15 text-brand-cyan flex items-center justify-center font-black text-lg shrink-0">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <div class="leading-tight">
+                                    <div class="text-xs font-black text-white">PCI DSS</div>
+                                    <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Protección de tarjetas</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Industries Badges -->
+                        <div class="glass-card-interactive p-3.5 rounded-2xl border border-brand-border space-y-2">
+                            <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider">Verticales Especializadas</div>
+                            <div class="flex flex-wrap gap-1.5 text-xs font-bold text-slate-300">
+                                <span class="px-2.5 py-1 rounded-lg bg-brand-surfaceLight border border-brand-border">🚗 Créditos Automotrices</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-brand-surfaceLight border border-brand-border">🛡️ Seguros & Factoring</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-brand-surfaceLight border border-brand-border">🎓 Educación</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-brand-surfaceLight border border-brand-border">🏢 Inmobiliarias</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-brand-surfaceLight border border-brand-border">💳 Tarjetas</span>
+                            </div>
+                        </div>
+
+                        <!-- Big Commercial CTA -->
+                        <button onclick="openLeadModal()" class="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-brand-blue via-brand-cyan to-brand-neonMint text-brand-base font-heading font-black text-base shadow-neon-mint active:scale-[0.98] transition flex items-center justify-center gap-3">
+                            <span>SOLICITAR DEMO / ASESORÍA GRATUITA</span>
+                            <i class="fas fa-paper-plane text-base"></i>
+                        </button>
+
+                    </div>
+
+                    <div class="text-center pt-2">
+                        <span class="text-xs font-bold text-slate-400">
+                            🇨🇱 Chile &bull; 🇲🇽 México &bull; 🇨🇴 Colombia &bull; www.upago.cl
+                        </span>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- ================= BOTTOM NAV DOCK ================= -->
+        <footer class="px-5 py-3 shrink-0 z-30 border-t border-brand-border/60 bg-brand-base/90 backdrop-blur-md flex items-center justify-between">
+            <button id="btnPrevTab" onclick="navPrev()" class="w-12 h-12 rounded-2xl glass-panel text-slate-300 hover:text-white flex items-center justify-center transition active:scale-90 disabled:opacity-20 disabled:cursor-not-allowed">
+                <i class="fas fa-chevron-left text-sm"></i>
+            </button>
+
+            <!-- Slide Dots -->
+            <div class="flex items-center gap-2">
+                <button onclick="changeSlide(0)" class="bullet-dot w-6 h-2.5 rounded-full bg-brand-neonMint transition-all duration-300"></button>
+                <button onclick="changeSlide(1)" class="bullet-dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></button>
+                <button onclick="changeSlide(2)" class="bullet-dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></button>
+                <button onclick="changeSlide(3)" class="bullet-dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></button>
+                <button onclick="changeSlide(4)" class="bullet-dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></button>
+            </div>
+
+            <button id="btnNextTab" onclick="navNext()" class="w-12 h-12 rounded-2xl bg-brand-blue text-white flex items-center justify-center shadow-neon-blue active:scale-90 transition">
+                <i class="fas fa-chevron-right text-sm"></i>
+            </button>
+        </footer>
+
+    </main>
+
+    <!-- ================= MODAL COMERCIAL: JUAN MANUEL CASTRO ================= -->
+    <div id="leadModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div id="leadModalCard" class="glass-card-interactive w-full max-w-md rounded-3xl p-5 sm:p-6 border border-brand-border text-white relative max-h-[92vh] overflow-y-auto transform scale-95 transition-transform duration-300 shadow-card-depth">
+            
+            <button onclick="closeLeadModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-brand-surfaceLight border border-brand-border text-slate-300 hover:text-white flex items-center justify-center active:scale-90 transition">
+                <i class="fas fa-xmark text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-blue to-brand-cyan flex items-center justify-center font-heading font-black text-xl text-white">
+                    U
+                </div>
+                <div>
+                    <h3 class="font-heading font-black text-xl text-white leading-tight">Solicitud de DEMO UPAGO</h3>
+                    <span class="text-xs text-brand-neonMint font-bold">Respuesta comercial en el mismo día</span>
+                </div>
+            </div>
+
+            <!-- Commercial Executive Card -->
+            <div class="p-3.5 rounded-2xl bg-brand-surface border border-brand-blue/30 flex items-center gap-3.5 mb-3.5 shadow-sm">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-blue to-brand-surfaceLight border border-brand-blue/40 text-brand-cyan flex items-center justify-center text-xl shrink-0">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="leading-tight text-left">
+                    <span class="text-[9px] font-black uppercase text-brand-cyan tracking-wider">Ejecutivo Comercial Asignado</span>
+                    <div class="text-sm font-black text-white mt-0.5">Juan Manuel Castro</div>
+                    <div class="text-xs font-semibold text-slate-300 flex flex-wrap gap-x-3 gap-y-1 mt-1">
+                        <a href="mailto:juanmanuel@upago.cl" class="text-brand-cyan hover:underline flex items-center gap-1">
+                            <i class="fas fa-envelope text-xs"></i> juanmanuel@upago.cl
+                        </a>
+                        <a href="tel:+56984032305" class="text-brand-neonMint hover:underline flex items-center gap-1">
+                            <i class="fas fa-phone text-xs"></i> +56 9 8403 2305
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="commercialLeadForm" onsubmit="handleFormSubmission(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-black text-slate-300 mb-1">Nombre Completo <span class="text-brand-cyan">*</span></label>
+                    <input id="inputName" type="text" required placeholder="Ej: Patricia Morales" class="w-full text-xs p-3 rounded-xl bg-brand-base border border-brand-border focus:outline-none focus:border-brand-cyan font-bold text-white placeholder-slate-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-black text-slate-300 mb-1">Email Corporativo <span class="text-brand-cyan">*</span></label>
+                        <input id="inputEmail" type="email" required placeholder="patricia@empresa.com" class="w-full text-xs p-3 rounded-xl bg-brand-base border border-brand-border focus:outline-none focus:border-brand-cyan font-bold text-white placeholder-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-300 mb-1">Teléfono / WhatsApp <span class="text-brand-cyan">*</span></label>
+                        <input id="inputPhone" type="tel" required placeholder="+56 9 8765 4321" class="w-full text-xs p-3 rounded-xl bg-brand-base border border-brand-border focus:outline-none focus:border-brand-cyan font-bold text-white placeholder-slate-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-black text-slate-300 mb-1">Empresa / Razón Social</label>
+                        <input id="inputCompany" type="text" placeholder="Ej: Servicios Financieros SpA" class="w-full text-xs p-3 rounded-xl bg-brand-base border border-brand-border focus:outline-none focus:border-brand-cyan font-bold text-white placeholder-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-300 mb-1">País <span class="text-brand-cyan">*</span></label>
+                        <select id="inputCountry" class="w-full text-xs p-3 rounded-xl bg-brand-base border border-brand-border focus:outline-none focus:border-brand-cyan font-black text-white">
+                            <option value="Chile" selected>🇨🇱 Chile</option>
+                            <option value="México">🇲🇽 México</option>
+                            <option value="Colombia">🇨🇴 Colombia</option>
+                            <option value="Otro LATAM">Otro país de LATAM</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-300 mb-1">Solución de Mayor Interés</label>
+                    <select id="inputInterest" class="w-full text-xs p-3 rounded-xl bg-brand-base border border-brand-border focus:outline-none focus:border-brand-cyan font-bold text-white">
+                        <option value="Suite Completa (Recaudo, PAC/PAT y Cobranza)">Suite Completa (Recaudo + PAC/PAT + Cobranza)</option>
+                        <option value="Recaudación y Conciliación Automática en Tiempo Real">Recaudación y Conciliación Bancaria</option>
+                        <option value="Pagos Automáticos Recurrentes (PAC/PAT)">Pagos Automáticos Recurrentes (PAC/PAT)</option>
+                        <option value="Cobranza Digital Preventiva y Prejudicial">Cobranza Digital Preventiva</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-300 mb-1">Mensaje o Requerimiento</label>
+                    <textarea id="inputMessage" rows="2" class="w-full text-xs p-3 rounded-xl bg-brand-base border border-brand-border focus:outline-none focus:border-brand-cyan font-bold text-white placeholder-slate-500" placeholder="Coméntanos el volumen mensual o dolor principal de cobranza..."></textarea>
+                </div>
+
+                <button id="btnLeadSubmit" type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-blue via-brand-cyan to-brand-neonMint text-brand-base font-black text-xs shadow-neon-mint active:scale-95 transition flex items-center justify-center gap-2">
+                    <i id="btnLeadIcon" class="fas fa-paper-plane"></i>
+                    <span id="btnLeadText">ENVIAR A JUAN MANUEL CASTRO</span>
+                </button>
+            </form>
+
+            <!-- Success Box -->
+            <div id="leadSuccessView" class="hidden text-center py-2 space-y-3">
+                <div class="w-12 h-12 rounded-full bg-brand-neonMint/20 text-brand-neonMint border border-brand-neonMint/40 flex items-center justify-center text-2xl mx-auto">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h4 class="font-heading font-black text-lg text-white">¡Solicitud Registrada con Éxito!</h4>
+                <p class="text-xs text-slate-300 font-medium">
+                    Tus antecedentes han sido derivados directamente a <strong class="text-brand-cyan">Juan Manuel Castro</strong> (<span class="text-white">juanmanuel@upago.cl</span> / <span class="text-white">+56 9 8403 2305</span>).
+                </p>
+                
+                <div class="p-3 rounded-2xl bg-brand-base border border-brand-border text-left space-y-1">
+                    <div class="text-[10px] font-black uppercase text-brand-neonMint tracking-wider">Confirmación Automática</div>
+                    <div id="leadFeedbackText" class="text-xs text-slate-300 leading-relaxed font-semibold">
+                        Nuestro equipo se pondrá en contacto a la brevedad.
+                    </div>
+                </div>
+
+                <button onclick="closeLeadModal()" class="w-full py-3 rounded-xl bg-brand-surfaceLight border border-brand-border text-white font-black text-xs hover:bg-white/10 transition">
+                    CERRAR
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        // State
+        let currentStep = 0;
+        const totalSteps = 5;
+        let isAudioMuted = false;
+
+        const topicTitles = [
+            "01 • Aseguramiento de Ingresos",
+            "02 • Recaudo & Conciliación",
+            "03 • Pagos Automáticos PAC/PAT",
+            "04 • Cobranza en 3 Tiempos",
+            "05 • Seguridad y Resultados"
+        ];
+
+        // Synthesizer Audio with Web Audio API
+        let audioContextInstance = null;
+
+        function getAudio() {
+            if (!audioContextInstance) {
+                audioContextInstance = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContextInstance.state === 'suspended') {
+                audioContextInstance.resume();
+            }
+            return audioContextInstance;
+        }
+
+        function playFeedbackSound(type) {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudio();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'swipe') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(540, ctx.currentTime + 0.06);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.06);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);     // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.26);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.26);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(480, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.03, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                }
+            } catch (e) {
+                console.log("Audio ready");
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('soundIcon');
+            if (!isAudioMuted) {
+                icon.className = "fas fa-volume-high text-xs text-brand-neonMint";
+            } else {
+                icon.className = "fas fa-volume-xmark text-xs text-slate-500";
+            }
+        }
+
+        // Swipe Gestures
+        let startTouchX = 0;
+        let endTouchX = 0;
+        const trackArea = document.getElementById('touchTrackArea');
+
+        trackArea.addEventListener('touchstart', e => {
+            startTouchX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        trackArea.addEventListener('touchend', e => {
+            endTouchX = e.changedTouches[0].screenX;
+            handleTouchSwipe();
+        }, { passive: true });
+
+        function handleTouchSwipe() {
+            const delta = startTouchX - endTouchX;
+            if (delta > 45) {
+                navNext();
+            } else if (delta < -45) {
+                navPrev();
+            }
+        }
+
+        // Slider Navigation
+        function updateSlider() {
+            const track = document.getElementById('trackSlider');
+            track.style.transform = `translateX(-${currentStep * 100}%)`;
+
+            // Update Topic indicator
+            document.getElementById('topicIndicator').innerText = topicTitles[currentStep];
+
+            // Update Segmented Story Bars
+            for (let i = 0; i < totalSteps; i++) {
+                const seg = document.getElementById(`segBar${i}`);
+                if (i <= currentStep) {
+                    seg.className = "h-1.5 rounded-full bg-brand-neonMint transition-all duration-300";
+                } else {
+                    seg.className = "h-1.5 rounded-full bg-brand-border transition-all duration-300";
+                }
+            }
+
+            // Update Bottom Dots
+            const dots = document.querySelectorAll('.bullet-dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentStep) {
+                    dot.className = "bullet-dot w-6 h-2.5 rounded-full bg-brand-neonMint transition-all duration-300";
+                } else {
+                    dot.className = "bullet-dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300";
+                }
+            });
+
+            // Update Footer Buttons
+            document.getElementById('btnPrevTab').disabled = (currentStep === 0);
+
+            const nextBtn = document.getElementById('btnNextTab');
+            if (currentStep === totalSteps - 1) {
+                nextBtn.innerHTML = '<i class="fas fa-check text-sm"></i>';
+                nextBtn.className = "w-12 h-12 rounded-2xl bg-brand-neonMint text-brand-base flex items-center justify-center shadow-neon-mint active:scale-90 transition font-black";
+            } else {
+                nextBtn.innerHTML = '<i class="fas fa-chevron-right text-sm"></i>';
+                nextBtn.className = "w-12 h-12 rounded-2xl bg-brand-blue text-white flex items-center justify-center shadow-neon-blue active:scale-90 transition";
+            }
+
+            playFeedbackSound('swipe');
+        }
+
+        function changeSlide(stepIndex) {
+            currentStep = stepIndex;
+            updateSlider();
+        }
+
+        function navNext() {
+            if (currentStep < totalSteps - 1) {
+                currentStep++;
+                updateSlider();
+            } else {
+                openLeadModal();
+            }
+        }
+
+        function navPrev() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateSlider();
+            }
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') navNext();
+            if (e.key === 'ArrowLeft') navPrev();
+        });
+
+        // ------------------ SIMULATORS LOGIC ------------------
+
+        // Simulator Slide 2: Channels
+        function setSimChannel(type) {
+            const amount = document.getElementById('simBankAmount');
+            const channel = document.getElementById('simBankChannel');
+            const details = document.getElementById('simBankDetails');
+
+            const btnT = document.getElementById('btnChanT');
+            const btnC = document.getElementById('btnChanC');
+            const btnR = document.getElementById('btnChanR');
+
+            [btnT, btnC, btnR].forEach(b => {
+                b.className = "py-2.5 px-2 rounded-xl text-xs font-black bg-brand-surfaceLight text-slate-300 border border-brand-border hover:text-white transition active:scale-95";
+            });
+
+            if (type === 'transfer') {
+                btnT.className = "py-2.5 px-2 rounded-xl text-xs font-black bg-brand-blue text-white shadow-sm transition active:scale-95";
+                amount.innerText = "$48.920.000";
+                channel.innerText = "Transferencia Directa";
+                details.innerHTML = "<span><i class='fas fa-check text-brand-neonMint mr-1.5'></i> Abono directo en tu cuenta corriente</span><span class='text-brand-neonMint font-black'>Inmediato</span>";
+            } else if (type === 'cards') {
+                btnC.className = "py-2.5 px-2 rounded-xl text-xs font-black bg-brand-cyan text-brand-base shadow-sm transition active:scale-95";
+                amount.innerText = "$64.300.000";
+                channel.innerText = "Tarjetas Débito/Crédito";
+                details.innerHTML = "<span><i class='fas fa-check text-brand-neonMint mr-1.5'></i> Liquidación con abono en cuenta bancaria</span><span class='text-brand-neonMint font-black'>48 hrs hábiles</span>";
+            } else {
+                btnR.className = "py-2.5 px-2 rounded-xl text-xs font-black bg-brand-neonMint text-brand-base shadow-sm transition active:scale-95";
+                amount.innerText = "$92.150.000";
+                channel.innerText = "Cargos PAC/PAT";
+                details.innerHTML = "<span><i class='fas fa-check text-brand-neonMint mr-1.5'></i> Débito automático recurrente mensual</span><span class='text-brand-neonMint font-black'>Autogestionado</span>";
+            }
+
+            playFeedbackSound('click');
+        }
+
+        function triggerSimConciliation() {
+            const btn = document.getElementById('btnActionReconcile');
+            const details = document.getElementById('simBankDetails');
+
+            btn.disabled = true;
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin text-xs'></i> <span>Leyendo cartola bancaria bajo regla/llave...</span>";
+            playFeedbackSound('click');
+
+            setTimeout(() => {
+                details.innerHTML = "<span><i class='fas fa-circle-check text-brand-neonMint mr-1.5'></i> 43 transferencias cruzadas con facturas</span><span class='text-brand-neonMint font-black'>Conciliado 100%</span>";
+                btn.innerHTML = "<i class='fas fa-check text-xs'></i> <span>¡CONCILIACIÓN EXITOSA! CARTOLA AL DÍA</span>";
+                btn.className = "w-full py-3 rounded-xl bg-emerald-500/20 border border-brand-neonMint/40 text-brand-neonMint font-black text-xs transition";
+                playFeedbackSound('success');
+            }, 1200);
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = "<i class='fas fa-play text-xs'></i> <span>SIMULAR NUEVA LECTURA DE CARTOLA</span>";
+                btn.className = "w-full py-3 rounded-xl bg-brand-surfaceLight border border-brand-cyan/40 text-brand-cyan hover:bg-brand-cyan/10 font-black text-xs transition active:scale-95 flex items-center justify-center gap-2";
+            }, 4000);
+        }
+
+        // Simulator Slide 3: Retry Engine
+        function testRetryEngine() {
+            const btn = document.getElementById('btnTestRetry');
+            const badge = document.getElementById('retryStateBadge');
+            const log = document.getElementById('retryConsoleLog');
+
+            btn.disabled = true;
+            badge.className = "text-[10px] font-black px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse";
+            badge.innerText = "1° Intento Rechazado (Fondos insuficientes)";
+            log.innerHTML = "<span class='text-rose-400'>[09:00 AM]</span> Cargo rechazado por emisor bancario. Activando motor de reintentos UPAGO...";
+            playFeedbackSound('click');
+
+            setTimeout(() => {
+                log.innerHTML = "<span class='text-amber-400'>[11:30 AM]</span> Algoritmo calcula hora óptima según comportamiento histórico...";
+            }, 1100);
+
+            setTimeout(() => {
+                badge.className = "text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-brand-neonMint border border-emerald-500/40";
+                badge.innerText = "2° Reintento: ¡Cobro Exitoso! ✅";
+                log.innerHTML = "<span class='text-brand-neonMint'>[02:15 PM]</span> ¡Cargo aprobado y conciliado! Dinero acreditado sin perder el cliente.";
+                btn.disabled = false;
+                btn.innerHTML = "<i class='fas fa-rotate-right'></i> <span>VOLVER A PROBAR MOTOR DE REINTENTO</span>";
+                playFeedbackSound('success');
+            }, 2400);
+        }
+
+        // Simulator Slide 4: Cobranza Cut Off
+        function executePaymentCut() {
+            const pill = document.getElementById('debtPill');
+            const btn = document.getElementById('btnTriggerPaymentCut');
+            const badges = document.querySelectorAll('.notice-badge');
+
+            pill.className = "text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-brand-neonMint border border-emerald-500/40";
+            pill.innerText = "PAGADO & SALDADO ✅";
+
+            badges.forEach(b => {
+                b.className = "notice-badge text-[10px] font-black text-brand-neonMint bg-emerald-500/15 px-2 py-0.5 rounded";
+                b.innerText = "🚫 Alerta Apagada";
+            });
+
+            btn.disabled = true;
+            btn.className = "w-full py-3.5 rounded-2xl bg-brand-surface border border-brand-border text-slate-400 font-bold text-xs flex items-center justify-center gap-2";
+            btn.innerHTML = "<i class='fas fa-check text-brand-neonMint'></i> <span>Conciliación detectó el abono. Cobranza detenida de raíz.</span>";
+
+            playFeedbackSound('success');
+        }
+
+        // ------------------ LEAD MODAL ------------------
+        function openLeadModal() {
+            const modal = document.getElementById('leadModal');
+            const card = document.getElementById('leadModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }, 10);
+            playFeedbackSound('click');
+        }
+
+        function closeLeadModal() {
+            const modal = document.getElementById('leadModal');
+            const card = document.getElementById('leadModalCard');
+            modal.classList.add('opacity-0');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function handleFormSubmission(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('btnLeadSubmit');
+            const submitText = document.getElementById('btnLeadText');
+            const submitIcon = document.getElementById('btnLeadIcon');
+
+            const name = document.getElementById('inputName').value;
+            const email = document.getElementById('inputEmail').value;
+            const phone = document.getElementById('inputPhone').value;
+            const company = document.getElementById('inputCompany').value || "No especificada";
+            const country = document.getElementById('inputCountry').value;
+            const interest = document.getElementById('inputInterest').value;
+            const message = document.getElementById('inputMessage').value || "Interés en automatización con UPAGO.";
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-75');
+            submitIcon.className = "fas fa-spinner fa-spin";
+            submitText.innerText = "ENVIANDO A JUAN MANUEL...";
+
+            try {
+                // Post asíncrono para juanmanuel@upago.cl
+                const payload = {
+                    _subject: `Nueva Solicitud DEMO UPAGO: ${name} (${company} - ${country})`,
+                    _replyto: email,
+                    "Ejecutivo Asignado": "Juan Manuel Castro (juanmanuel@upago.cl / +56 9 8403 2305)",
+                    "Nombre": name,
+                    "Email": email,
+                    "Teléfono": phone,
+                    "Empresa": company,
+                    "País": country,
+                    "Interés": interest,
+                    "Requerimiento": message
+                };
+
+                fetch("https://formsubmit.co/ajax/juanmanuel@upago.cl", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(payload)
+                }).catch(err => console.log("Form submitted gracefully:", err));
+
+                document.getElementById('leadFeedbackText').innerHTML = `Hola <strong>${name}</strong>, hemos registrado tu solicitud para <strong>${company} (${country})</strong>.<br><br><strong>Juan Manuel Castro</strong> se comunicará directamente a tu teléfono <strong>${phone}</strong> o al correo <strong>${email}</strong> para coordinar la demostración técnica de <strong>${interest}</strong>.`;
+
+                document.getElementById('commercialLeadForm').classList.add('hidden');
+                document.getElementById('leadSuccessView').classList.remove('hidden');
+
+                playFeedbackSound('success');
+            } catch (err) {
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-75');
+                submitIcon.className = "fas fa-paper-plane";
+                submitText.innerText = "ENVIAR A JUAN MANUEL CASTRO";
+            }
+        }
+    </script>
+</body>
+</html>
